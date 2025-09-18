@@ -379,6 +379,8 @@ for entry in "${CHECKS[@]}"; do
   done < <(
     find "$ROOT" -xdev \
       \( \
+        -path "$HOME/.Trash" -o \
+        -path "$HOME/.Trash/*" -o \
         -path "$HOME/Library/*" -o \
         -path "$HOME/Applications/*" -o \
         -path "$HOME/Music/*" -o \
