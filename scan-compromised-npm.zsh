@@ -12,7 +12,6 @@ for entry in "${CHECKS[@]}"; do
   pkg="${entry%@*}"
   ver="${entry##*@}"
   
-  echo
   echo "--- Checking for '${pkg}', compromised version is '${ver}' ---"
 
   found_files=$(find . -type f -path "*/node_modules/$pkg/package.json" 2>/dev/null)
@@ -25,7 +24,6 @@ for entry in "${CHECKS[@]}"; do
   # Loop through each package.json found for the package
   for file in ${(f)found_files}; do
     # Extract the installed version from the file.
-    # We use grep to find the line and awk to extract the 4th field using " as a delimiter.
     installed_ver=$(grep '"version":' "$file" | awk -F'"' '{print $4}')
 
     if [[ -z "$installed_ver" ]]; then
@@ -36,8 +34,26 @@ for entry in "${CHECKS[@]}"; do
     # Compare the installed version with the compromised one
     if [[ "$installed_ver" == "$ver" ]]; then
       echo "🚨 VULNERABLE: Found matching version $installed_ver in: $file"
+      # Add the vulnerable path to our summary array
+      vulnerable_paths+=("$file")
     else
       echo "ℹ️  Found different version: $installed_ver in: $file"
     fi
   done
 done
+
+# --- Print the summary at the end ---
+echo
+echo "========================================"
+echo "          Scan Summary"
+echo "========================================"
+
+if [[ ${#vulnerable_paths[@]} -gt 0 ]]; then
+  echo "🚨 Found ${#vulnerable_paths[@]} vulnerable package installation(s):"
+  # Loop through the array and print each affected path
+  for path in "${vulnerable_paths[@]}"; do
+    echo "  - $path"
+  done
+else
+  echo "✅ No packages with specifically compromised versions were found."
+fi
