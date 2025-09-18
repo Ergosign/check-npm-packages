@@ -3,6 +3,8 @@
 # List of compromised packages with their affected versions
 # Format: "package@version"
 CHECKS=(
+  #testing
+  "@nuxt/eslint@1.9.0" "@nuxt/eslint@1.8.0"
   "@ctrl/tinycolor@4.1.1" "@ctrl/tinycolor@4.1.2"
 )
 
